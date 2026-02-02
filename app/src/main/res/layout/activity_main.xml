@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:src="@drawable/logo_diakron_text"
+        android:scaleType="fitStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="16dp"/>
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ESTADO DEL SEGREGADOR"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/imgLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Contenedor indicadores -->
+    <LinearLayout
+        android:id="@+id/indicatorContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/txtTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:weightSum="4">
+
+        <!-- Indicador 1 -->
+        <include layout="@layout/item_indicator"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+        <!-- Indicador 2 -->
+        <include layout="@layout/item_indicator"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+        <!-- Indicador 3 -->
+        <include layout="@layout/item_indicator"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+        <!-- Indicador 4 -->
+        <include layout="@layout/item_indicator"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSoyRecolector"
+        android:backgroundTint="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="Soy Recolector"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
