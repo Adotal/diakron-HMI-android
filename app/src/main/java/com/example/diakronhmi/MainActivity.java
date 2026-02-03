@@ -1,10 +1,15 @@
 package com.example.diakronhmi;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_main);
 
         // Asignar interfaz a objetos
@@ -90,34 +96,34 @@ public class MainActivity extends AppCompatActivity {
         glassCircle.setProgress(glassPercent);
         glassText.setText(glassPercent + " %");
 
-
-
         // Desactivar pantalla anclada manteniendo presionado TextView
         tvvTitle.setOnLongClickListener(v -> {
             stopLockTask();
             return true;
         });
 
-        // Evitar que la pantalla se duerma
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+        // Foto manual
+        Button btnPhoto = findViewById(R.id.btnManualPhoto);
+        btnPhoto.setOnClickListener(v -> {
+            // INICIAR ACTIVITY DE QR Y MANDA ORDEN A ESP32 POR WEBSOCKET
+            Intent toQRActivity = new Intent(this, QRActivity.class);
+            startActivity(toQRActivity);
+
+        });
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         // Anclar la pantalla al iniciar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startLockTask();
         }
-
         // Ocultar UI
-        hideSystemUI();
-
-//        handler.post(uiHider);
-    }
-
-    private void hideSystemUI() {
         View decor = getWindow().getDecorView();
         decor.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -127,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         );
+
+        // Evitar que la pantalla se duerma
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 }
