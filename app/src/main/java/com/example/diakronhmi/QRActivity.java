@@ -3,6 +3,9 @@ package com.example.diakronhmi;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -18,6 +21,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.util.Arrays;
+
+import okio.ByteString;
+
 public class QRActivity extends AppCompatActivity {
 
     // Donde se muestra código QR
@@ -31,7 +38,6 @@ public class QRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_qractivity);
-
 
         // Asigna interfaz a objetos
         qrImg = findViewById(R.id.qrImg);
@@ -49,7 +55,7 @@ public class QRActivity extends AppCompatActivity {
 
         // Anclar la pantalla al iniciar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startLockTask();
+//            startLockTask();
         }
         // Ocultar UI
         View decor = getWindow().getDecorView();
@@ -66,16 +72,35 @@ public class QRActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
-        // Crea QR
+        // Create QR Code
         try {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.encodeBitmap("1234333888888886464646464646464646464646464646464646464646464646464646464646464" +
-                    "1234333888888886464646464646464646464646464646464646464646464646464646464646464", BarcodeFormat.QR_CODE, 1000, 1000);
+
+            // Get byteArrayPayload by extra
+            byte[] byteArrayPayload = getIntent().getByteArrayExtra("byteArrayPayload");
+
+            // Create string of QR payload (Base64 to achieve the smaller size possible)
+            // 80 Bytes ->  107 Base64 Char
+            String qrPayload = Base64.encodeToString(
+                    byteArrayPayload,
+                    Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE
+            );
+
+            Bitmap bitmap = barcodeEncoder.encodeBitmap(qrPayload, BarcodeFormat.QR_CODE, 1000, 1000);
             ImageView imageViewQrCode = (ImageView) findViewById(R.id.qrImg);
             imageViewQrCode.setImageBitmap(bitmap);
         } catch (Exception e){
             e.printStackTrace();
-
         }
+
+
+        // Destroy activity after 60 secs
+        Toast.makeText(this, "Deleting Activity in 60 secs", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, 30000);
     }
 }

@@ -1,9 +1,7 @@
 package com.example.diakronhmi;
 
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,19 +11,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.diakron.ui.CircularFillView;
+import com.diakron.websocket.MyWebSocketListener;
+import com.diakron.websocket.WebSocketInterface;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WebSocketInterface {
 
     CircularFillView metalCircle, plasticCircle, paperCircle, glassCircle;
-    TextView tvvTitle, metalText, plasticText, paperText, glassText;
+    TextView tvTitle, metalText, plasticText, paperText, glassText;
     ImageView metalImg, plasticImg, paperImg, glassImg;
 
     @Override
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Asignar interfaz a objetos
-        tvvTitle = findViewById(R.id.txtTitle);
+        tvTitle = findViewById(R.id.txtTitle);
 
         // Obtener contenedor de indicadores
         LinearLayout container = findViewById(R.id.indicatorContainer);
@@ -97,20 +95,25 @@ public class MainActivity extends AppCompatActivity {
         glassText.setText(glassPercent + " %");
 
         // Desactivar pantalla anclada manteniendo presionado TextView
-        tvvTitle.setOnLongClickListener(v -> {
+        tvTitle.setOnLongClickListener(v -> {
             stopLockTask();
             return true;
         });
 
+        // Create WebSocket
+        MyWebSocketListener.getInstance().setActivity(this);
+        // Connect WebSocket
+        MyWebSocketListener.getInstance().connect();
 
 
         // Foto manual
         Button btnPhoto = findViewById(R.id.btnManualPhoto);
+
+
         btnPhoto.setOnClickListener(v -> {
             // INICIAR ACTIVITY DE QR Y MANDA ORDEN A ESP32 POR WEBSOCKET
-            Intent toQRActivity = new Intent(this, QRActivity.class);
-            startActivity(toQRActivity);
-
+            MyWebSocketListener.getInstance().sendMessage("CAPT");
+            Toast.makeText(this, "Orden capturar enviada", Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -121,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Anclar la pantalla al iniciar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startLockTask();
+//            startLockTask();
         }
         // Ocultar UI
         View decor = getWindow().getDecorView();
@@ -138,4 +141,32 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    // --------------WEBSOCKET INTERFACE OVERRIDE METHODS---------------
+    // All must be run with runOnUiThread
+    @Override
+    public void onMessageReceived(String string) {
+        runOnUiThread((() -> {
+            Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+        }));
+
+    }
+
+    @Override
+    public void onQRPayloadReceived(byte[] byteArrayPayload) {
+        runOnUiThread((() -> {
+            // Start new intent and send qrPayload by putExtra
+            Intent toQRActivity = new Intent(this, QRActivity.class);
+            toQRActivity.putExtra("byteArrayPayload", byteArrayPayload);
+            startActivity(toQRActivity);
+        }));
+    }
+
+    @Override
+    public void onConnectionStatus(Boolean connected) {
+        runOnUiThread((() -> {
+
+            if(connected == true)
+                Toast.makeText(this, "CONNECTED ESP32", Toast.LENGTH_SHORT).show();
+        }));
+    }
 }

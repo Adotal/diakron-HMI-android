@@ -40,6 +40,10 @@ dependencies {
     androidTestImplementation libs.espresso.core
 
 
+    // WebSocket Compatible with Android 5+
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+
+    // QR Generation
     implementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 }

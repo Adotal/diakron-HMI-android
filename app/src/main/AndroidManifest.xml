@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"> <!-- Necesario para poder compilar API 21 -->
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Neccesary to compile API 21 -->
     <uses-sdk tools:overrideLibrary="androidx.activity,androidx.navigationevent" />
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
