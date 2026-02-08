@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -141,6 +142,16 @@ public class MainActivity extends AppCompatActivity implements WebSocketInterfac
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Ask for fill levels to update them
+        MyWebSocketListener.getInstance().sendMessage("FL");
+
+
+    }
+
     // --------------WEBSOCKET INTERFACE OVERRIDE METHODS---------------
     // All must be run with runOnUiThread
     @Override
@@ -162,11 +173,38 @@ public class MainActivity extends AppCompatActivity implements WebSocketInterfac
     }
 
     @Override
+    public void onFillLevelsReceived(byte[] byteArrayPayload) {
+        runOnUiThread((() -> {
+
+            Toast.makeText(this, "Received Fill Levels", Toast.LENGTH_SHORT).show();
+
+            int[] fillLevels = new int[4];
+            // Receiving fill levels of trash bins in order: Metal, Plastic, CardPaper, Glass
+            // [i+2] because indexes 0 and 1 are F and L respectively
+            for(int i = 0; i < 4; ++i) {
+                fillLevels[i] = byteArrayPayload[i+2] & 0xFF;
+                Log.e("FILL:", "["+i+"]: " +fillLevels[i] + " ");
+            }
+
+            metalCircle.setProgress(fillLevels[0]);
+            metalText.setText(fillLevels[0] + " %");
+            plasticCircle.setProgress(fillLevels[1]);
+            plasticText.setText(fillLevels[1] + " %");
+            paperCircle.setProgress(fillLevels[2]);2
+            paperText.setText(fillLevels[2] + " %");
+            glassCircle.setProgress(fillLevels[3]);
+            glassText.setText(fillLevels[3] + " %");
+
+        }));
+
+    }
+
+    @Override
     public void onConnectionStatus(Boolean connected) {
         runOnUiThread((() -> {
 
-            if(connected == true)
-                Toast.makeText(this, "CONNECTED ESP32", Toast.LENGTH_SHORT).show();
+//            if(connected == true)
+//                Toast.makeText(this, "CONNECTED ESP32", Toast.LENGTH_SHORT).show();
         }));
     }
 }

@@ -2,6 +2,7 @@ package com.diakron.websocket;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -118,8 +119,15 @@ public class MyWebSocketListener extends WebSocketListener {
 
                 // Receiving QR Payload
                 byte[] byteArrayPayload = bytes.toByteArray();
-                // Store byteArray in activity
-                activity.onQRPayloadReceived(byteArrayPayload);
+
+                // Receive fill levels
+                if (byteArrayPayload.length == 6 && byteArrayPayload[0] == 'F' && byteArrayPayload[1] == 'L'){
+                    activity.onFillLevelsReceived(byteArrayPayload);
+
+                } else {
+                    // Store byteArray in activity
+                    activity.onQRPayloadReceived(byteArrayPayload);
+                }
             }
 
             @Override

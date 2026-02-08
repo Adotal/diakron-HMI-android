@@ -6,5 +6,6 @@ import android.graphics.Bitmap;
 public interface WebSocketInterface {
     void onMessageReceived(String string);
     void onQRPayloadReceived(byte[] byteArrayPayload);
+    void onFillLevelsReceived(byte[] byteArrayPayload);
     void onConnectionStatus(Boolean connected);
 }
